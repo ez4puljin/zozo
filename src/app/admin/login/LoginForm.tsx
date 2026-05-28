@@ -1,11 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { loginAction } from "@/server/actions/auth";
 
 export function LoginForm() {
-  const router = useRouter();
   const sp = useSearchParams();
   const from = sp.get("from") || "/admin";
   const [pending, start] = useTransition();
@@ -19,11 +18,10 @@ export function LoginForm() {
         const password = String(fd.get("password") ?? "");
         setError(null);
         start(async () => {
-          const r = await loginAction(password);
-          if (r.ok) {
-            router.replace(from);
-            router.refresh();
-          } else {
+          // loginAction redirects internally on success;
+          // a return value means failure.
+          const r = await loginAction(password, from);
+          if (r && !r.ok) {
             setError(r.error);
           }
         });
