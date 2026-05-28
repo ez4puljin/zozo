@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useCallback, memo } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Trash2, Plus, Star, Info, Sparkles } from "lucide-react";
@@ -229,7 +229,7 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
       {/* Top help banner */}
       {!data.id ? (
         <InfoBox>
-          <strong>💡 Анхны бараа нэмэх үе:</strong> Доорх алхмуудыг дарааллаар хий — <b>1)</b> Нэр + үнэ бичих, <b>2)</b> Зураг оруулах, <b>3)</b> "Урамшуулал шаблон" сонгох (2+1 г.м), <b>4)</b> Статус &ldquo;Идэвхтэй&rdquo; болгоод хадгалах.
+          <strong>💡 Анх бараа нэмэх үед:</strong> Доорх алхмуудыг дарааллаар гүйцэтгээрэй — <b>1)</b> Нэр болон үнэ оруулах, <b>2)</b> Зураг хуулах, <b>3)</b> &ldquo;Урамшууллын загвар&rdquo; сонгох (2+1 гэх мэт), <b>4)</b> Төлвийг &ldquo;Идэвхтэй&rdquo; болгож хадгалах.
         </InfoBox>
       ) : null}
 
@@ -251,8 +251,8 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
               />
             </Field>
             <Field
-              label="URL slug"
-              hint="Хоосон үлдээвэл нэрнээс автомат үүснэ. Жишээ: 'moogtei-coffee'. Latin үсэг, тоо, dash ашиглах."
+              label="URL хаяг (slug)"
+              hint="Хоосон орхивол барааны нэрнээс автомат үүснэ. Жишээ: 'moogtei-coffee'. Зөвхөн латин үсэг, тоо, зураас ( - ) ашиглана."
             >
               <input
                 value={data.slug ?? ""}
@@ -268,7 +268,7 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
             </Field>
             <Field
               label="Барааны тайлбар"
-              hint="Барааны хуудсанд гарах гол тайлбар. Цэг таслал, мөр шилжүүлэлт ашиглаж болно."
+              hint="Барааны хуудсанд гарах гол тайлбар. Цэг таслал, шинэ мөр ашиглаж болно."
             >
               <textarea
                 value={data.descriptionMd}
@@ -280,14 +280,14 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
             </Field>
             <Field
               label="Хэрэглэх заавар"
-              hint="Хэрэглэгч бараагаа хэрхэн ашиглахыг тайлбарлана."
+              hint="Хэрэглэгч бүтээгдэхүүнийг хэрхэн ашиглах талаар тайлбарлана уу."
             >
               <textarea
                 value={data.howToUseMd}
                 onChange={(e) => update({ howToUseMd: e.target.value })}
                 rows={3}
                 className={inputCls}
-                placeholder="Жишээ: 1 халбага нунтгийг 200мл буцалсан устай холь..."
+                placeholder="Жишээ: 1 халбага нунтгийг 200мл буцалсан устай хольж уугаарай."
               />
             </Field>
           </Card>
@@ -295,8 +295,8 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
           {/* Images */}
           <Card title="2. Зураг" stepNumber={2}>
             <p className="text-xs text-muted-foreground mb-3">
-              Зөвлөмж: 1 удаа 3-5 зураг оруулна. Үндсэн зургийг ⭐ товчоор тэмдэглэнэ — энэ нь
-              барааны хуудас, Facebook share-д харагдана.
+              Зөвлөмж: эхлээд 3-5 зураг хуулаарай. Үндсэн зургийг ⭐ товчоор тэмдэглэнэ — энэ зураг
+              барааны хуудас болон Facebook хуваалцалт дээр харагдана.
             </p>
 
             {data.images.length > 0 ? (
@@ -405,28 +405,28 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
           {/* Variants — the most important UX */}
           <Card title="3. Үнэ ба урамшуулал" stepNumber={3}>
             <InfoBox>
-              <strong>📚 Энэ хэсэг гэж юу вэ?</strong>
+              <strong>📚 Энэ хэсэг юу вэ?</strong>
               <br />
-              Нэг бүтээгдэхүүний өөр өөр <b>багц/тоо</b>-н сонголтыг энд тохируулна. Жишээ:
+              Нэг бүтээгдэхүүний өөр өөр <b>багц буюу тооны</b> сонголтыг энд тохируулна. Жишээ:
               <ul className="mt-1 ml-4 list-disc">
                 <li>
                   <b>1 ширхэг</b> — энгийн худалдаа
                 </li>
                 <li>
-                  <b>2 авбал 1 БЭЛЭГ</b> — 2 ширхэг үнээр 3 ширхэг өгөх (хэрэглэгч их сонгодог)
+                  <b>2 авбал 1 БЭЛЭГ</b> — хоёрын үнээр гурван ширхэг авах (хэрэглэгчид хамгийн их сонгодог)
                 </li>
               </ul>
               <br />
               <span className="text-xs">
-                💡 <b>Зөвлөмж:</b> Доорх "Урамшуулал шаблон"-оос дарж автомат бөглөж аваарай.
+                💡 <b>Зөвлөмж:</b> Доорх &ldquo;Урамшууллын загвар&rdquo;-аас сонговол бүх талбар автомат бөглөгдөнө.
               </span>
             </InfoBox>
 
             {/* Preset templates */}
             <div className="space-y-2">
               <div className="text-xs font-semibold flex items-center gap-1">
-                <Sparkles className="h-3.5 w-3.5" /> Урамшуулал шаблон (нэг дарвал бүх variant
-                бөглөгдөнө)
+                <Sparkles className="h-3.5 w-3.5" /> Урамшууллын загвар (нэг товч дарахад бүх
+                сонголт автомат бөглөгдөнө)
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {VARIANT_PRESETS.map((p) => (
@@ -445,8 +445,8 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
                 ))}
               </div>
               <p className="text-[11px] text-muted-foreground">
-                ⚠️ Preset товч дарахын өмнө баруун талын &ldquo;Үндсэн үнэ&rdquo;-г бөглөнө үү.
-                Үнэ автомат тооцоолно.
+                ⚠️ Загвар сонгохын өмнө баруун талын &ldquo;Үндсэн үнэ&rdquo;-г бөглөнө үү. Үнэ
+                автоматаар тооцоологдоно.
               </p>
             </div>
 
@@ -455,7 +455,9 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
             {/* Variants list */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="text-xs font-semibold">Variant-ууд ({data.variants.length})</div>
+                <div className="text-xs font-semibold">
+                  Сонголтууд ({data.variants.length})
+                </div>
                 <button
                   type="button"
                   onClick={() =>
@@ -471,47 +473,54 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
                   }
                   className="inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-xs font-semibold hover:bg-muted"
                 >
-                  <Plus className="h-3 w-3" /> Variant нэмэх
+                  <Plus className="h-3 w-3" /> Сонголт нэмэх
                 </button>
               </div>
 
               {data.variants.map((v, i) => (
-                <VariantCard
+                <MemoVariantCard
                   key={i}
                   variant={v}
                   index={i}
                   total={data.variants.length}
                   onChange={(patch) =>
-                    update({
-                      variants: data.variants.map((vv, j) =>
+                    setData((d) => ({
+                      ...d,
+                      variants: d.variants.map((vv, j) =>
                         j === i ? { ...vv, ...patch } : vv
                       ),
-                    })
+                    }))
                   }
                   onSetDefault={() =>
-                    update({
-                      variants: data.variants.map((vv, j) => ({ ...vv, isDefault: j === i })),
-                    })
+                    setData((d) => ({
+                      ...d,
+                      variants: d.variants.map((vv, j) => ({ ...vv, isDefault: j === i })),
+                    }))
                   }
                   onRemove={() =>
-                    update({ variants: data.variants.filter((_, j) => j !== i) })
+                    setData((d) => ({
+                      ...d,
+                      variants: d.variants.filter((_, j) => j !== i),
+                    }))
                   }
                   onMoveUp={
                     i > 0
-                      ? () => {
-                          const next = [...data.variants];
-                          [next[i - 1], next[i]] = [next[i], next[i - 1]];
-                          update({ variants: next });
-                        }
+                      ? () =>
+                          setData((d) => {
+                            const next = [...d.variants];
+                            [next[i - 1], next[i]] = [next[i], next[i - 1]];
+                            return { ...d, variants: next };
+                          })
                       : undefined
                   }
                   onMoveDown={
                     i < data.variants.length - 1
-                      ? () => {
-                          const next = [...data.variants];
-                          [next[i], next[i + 1]] = [next[i + 1], next[i]];
-                          update({ variants: next });
-                        }
+                      ? () =>
+                          setData((d) => {
+                            const next = [...d.variants];
+                            [next[i], next[i + 1]] = [next[i + 1], next[i]];
+                            return { ...d, variants: next };
+                          })
                       : undefined
                   }
                 />
@@ -524,7 +533,7 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
           <Card title="Үндсэн үнэ" stepNumber={1}>
             <Field
               label="Үндсэн үнэ (₮)"
-              hint="Энэ үнийг preset шаблон ашиглах үед эх үнэ болгож тооцоолно."
+              hint="Урамшууллын загвар ашиглах үед энэ үнэ дээр тулгуурлан сонголт бүрийн үнийг тооцоолно."
               required
             >
               <input
@@ -540,7 +549,7 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
             </Field>
             <Field
               label="Хямдралгүй үнэ"
-              hint="Бараан дээр зураастай харагдах 'хуучин' үнэ (compare-at). Хэмнэлт хэр болохыг харуулна."
+              hint="Бараан дээр зураастай харагдах 'хуучин' үнэ. Хэрэглэгчид хэр хэмнэснийг харуулна."
             >
               <input
                 type="number"
@@ -562,8 +571,8 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
               ) : null}
             </Field>
             <Field
-              label="Хямдралын тэмдэг (%)"
-              hint="Каталогт бараан дээр харагдах '-33%' гэх мэт тэмдэг."
+              label="Хямдралын хувь (%)"
+              hint="Каталогт бараан дээр харагдах '-33%' хэлбэрийн тэмдэг."
             >
               <input
                 type="number"
@@ -579,8 +588,8 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
 
           <Card title="Нөөц" stepNumber={4}>
             <Field
-              label="Нөөц (ширхэг)"
-              hint="Танд хэдэн ширхэг бэлэн байгаа. Захиалга авагдсаны дараа автомат хасагдана."
+              label="Үлдэгдэл (ширхэг)"
+              hint="Танд хэдэн ширхэг бэлэн байгаа. Захиалга үүсэх бүрд автоматаар хасагдана."
             >
               <input
                 type="number"
@@ -592,8 +601,8 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
               />
             </Field>
             <Field
-              label="Бага нөөцийн босго"
-              hint="Энэ тооноос доош буухад admin dashboard-д сэрэмжлэл харагдана."
+              label="Бага үлдэгдлийн босго"
+              hint="Үлдэгдэл энэ тооноос доош буухад хяналтын самбарт анхааруулга харагдана."
             >
               <input
                 type="number"
@@ -605,10 +614,10 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
             </Field>
           </Card>
 
-          <Card title="Нийтлэх статус" stepNumber={5}>
+          <Card title="Нийтлэх төлөв" stepNumber={5}>
             <Field
-              label="Status"
-              hint="Идэвхтэй = хэрэглэгчид харагдана. Ноорог = зөвхөн админд."
+              label="Төлөв"
+              hint="Идэвхтэй = хэрэглэгчдэд харагдана. Ноорог = зөвхөн админд харагдана."
             >
               <select
                 value={data.status}
@@ -617,13 +626,13 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
                 }
                 className={inputCls}
               >
-                <option value="draft">Ноорог (зөвхөн админд)</option>
-                <option value="active">Идэвхтэй (хэрэглэгчид харагдана)</option>
+                <option value="draft">Ноорог (зөвхөн админд харагдана)</option>
+                <option value="active">Идэвхтэй (хэрэглэгчдэд харагдана)</option>
               </select>
             </Field>
             <Field
               label="Эрэмбэ"
-              hint="Каталогт яаж эрэмбэлэх вэ. Бага тоо = өмнө гарна."
+              hint="Каталогт яаж эрэмбэлэгдэх вэ. Бага тоо = өмнө гарна."
             >
               <input
                 type="number"
@@ -636,8 +645,8 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
 
           <Card title="SEO ба үнэлгээ (нэмэлт)">
             <Field
-              label="SEO Title"
-              hint="Google хайлт болон Facebook share-д харагдах гарчиг. Хоосон бол барааны нэрийг ашиглана."
+              label="SEO гарчиг"
+              hint="Google хайлт болон Facebook хуваалцалт дээр харагдах гарчиг. Хоосон орхивол барааны нэрийг ашиглана."
             >
               <input
                 value={data.seoTitle ?? ""}
@@ -647,8 +656,8 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
               />
             </Field>
             <Field
-              label="SEO Description"
-              hint="Хайлтын үр дүнд харагдах товч тайлбар (160 тэмдэгт)."
+              label="SEO тайлбар"
+              hint="Хайлтын үр дүнд харагдах товч тайлбар (160 тэмдэгтэд багтаах)."
             >
               <textarea
                 value={data.seoDescription ?? ""}
@@ -658,7 +667,7 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
               />
             </Field>
             <div className="grid grid-cols-2 gap-2">
-              <Field label="Үнэлгээ (0-5)" hint="Сэтгэгдэлгүй учир гар тааруулна.">
+              <Field label="Үнэлгээ (0-5 од)" hint="Үнэлгээний систем байхгүй тул гараар тохируулна уу.">
                 <input
                   type="number"
                   step={0.1}
@@ -727,16 +736,18 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
 
 /* ---------- Subcomponents ---------- */
 
-function VariantCard({
-  variant: v,
-  index,
-  total,
-  onChange,
-  onSetDefault,
-  onRemove,
-  onMoveUp,
-  onMoveDown,
-}: {
+const MemoVariantCard = memo(VariantCardImpl, (prev, next) => {
+  // Re-render only if THIS variant's data or position relative props changed.
+  return (
+    prev.index === next.index &&
+    prev.total === next.total &&
+    prev.variant === next.variant &&
+    !!prev.onMoveUp === !!next.onMoveUp &&
+    !!prev.onMoveDown === !!next.onMoveDown
+  );
+});
+
+interface VariantCardProps {
   variant: VariantData;
   index: number;
   total: number;
@@ -745,7 +756,17 @@ function VariantCard({
   onRemove: () => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
-}) {
+}
+
+function VariantCardImpl({
+  variant: v,
+  total,
+  onChange,
+  onSetDefault,
+  onRemove,
+  onMoveUp,
+  onMoveDown,
+}: VariantCardProps) {
   const savings =
     v.compareAtPriceMnt && v.compareAtPriceMnt > v.priceMnt
       ? v.compareAtPriceMnt - v.priceMnt
@@ -771,7 +792,7 @@ function VariantCard({
           {v.isDefault ? "✓ Үндсэн сонголт" : "Үндсэн болгох"}
         </button>
         <span className="text-xs text-muted-foreground ml-1">
-          {v.isDefault ? "(хэрэглэгчид сонгогдсон байна)" : ""}
+          {v.isDefault ? "(хэрэглэгчид анхнаасаа сонгогдсон харагдана)" : ""}
         </span>
         <div className="ml-auto flex items-center gap-1">
           {onMoveUp ? (
@@ -799,7 +820,7 @@ function VariantCard({
             onClick={onRemove}
             disabled={total <= 1}
             className="rounded p-1 text-destructive disabled:opacity-30"
-            title="Variant устгах"
+            title="Сонголтыг устгах"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
@@ -819,22 +840,22 @@ function VariantCard({
           />
         </Field>
         <Field
-          label="Тэмдэг (нэмэлт)"
-          hint='Variant дээр гарах жижиг тэмдэг. Жишээ: "ХАМГИЙН ТОХИРОМЖТОЙ", "ХЭМНЭЛТ".'
+          label="Жижиг тэмдэг (нэмэлт)"
+          hint='Сонголт дээр гарах товч тэмдэг. Жишээ: "ХАМГИЙН ТОХИРОМЖТОЙ", "ХЭМНЭЛТ".'
         >
           <input
             value={v.badge ?? ""}
             onChange={(e) => onChange({ badge: e.target.value || null })}
             className={inputCls}
-            placeholder="(хоосон үлдээж болно)"
+            placeholder="(хоосон орхиж болно)"
           />
         </Field>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         <Field
-          label="Хэдэн ширхэг ШИГ ҮҮС вэ?"
-          hint="2+1 урамшуулалд 3 ширхэг (2 худалдан + 1 БЭЛЭГ) хүргэгдэнэ — энд '3' гэж бичнэ."
+          label="Нийт хүргэх ширхэгийн тоо"
+          hint="Энэ багцад хичнээн ширхэг бараа хүргэх вэ. Жишээ: 2+1 урамшуулалд 3 (2 худалдан авсан + 1 БЭЛЭГ) гэж бичнэ."
         >
           <input
             type="number"
@@ -845,8 +866,8 @@ function VariantCard({
           />
         </Field>
         <Field
-          label="Variant үнэ (₮)"
-          hint="Хэрэглэгчид төлөх дүн. 2+1 урамшуулалд 2 ширхэгийн үнэ (1-ийн биш!)."
+          label="Багцын үнэ (₮)"
+          hint="Хэрэглэгчийн төлөх нийт дүн. Жишээ нь 2+1 урамшуулалд 2 ширхэгийн үнийг бичнэ."
           required
         >
           <input
@@ -859,8 +880,8 @@ function VariantCard({
           />
         </Field>
         <Field
-          label="Compare-at үнэ (₮)"
-          hint="Зураастай 'хуучин' үнэ. Хэмнэлтийг харуулна."
+          label="Хямдралгүй үнэ (₮)"
+          hint="Бараан дээр зураастай харагдах 'хуучин' үнэ. Хэрэглэгчид хэр хэмнэснийг харуулна."
         >
           <input
             type="number"
@@ -877,7 +898,7 @@ function VariantCard({
         </Field>
       </div>
 
-      <Field label="Хямдрал % (тэмдэг)" hint="Variant дээр харагдах '-33%'-ийн тэмдэг.">
+      <Field label="Хямдралын хувь (%)" hint="Багц дээр харагдах '-33%' хэлбэрийн тэмдэг.">
         <input
           type="number"
           min={0}
@@ -892,7 +913,7 @@ function VariantCard({
       {v.label && v.priceMnt > 0 ? (
         <div className="rounded-md border border-dashed bg-background p-3 mt-2">
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
-            👁 Хэрэглэгчид ийм харагдана:
+            👁 Хэрэглэгчид ийм байдлаар харагдана:
           </div>
           <div className="flex items-center justify-between gap-3">
             <div>

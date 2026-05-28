@@ -110,7 +110,7 @@ export function ProductPurchasePanel({
 
       <div>
         <div className="text-xs font-semibold uppercase tracking-wider text-center py-2 border-y mb-3">
-          Энэ 7 хоногын урамшуулал
+          Энэ 7 хоногийн урамшуулал
         </div>
         <BundleSelector
           variants={variants}
