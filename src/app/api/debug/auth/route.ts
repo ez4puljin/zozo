@@ -4,6 +4,9 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { env } from "@/lib/env";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const test = url.searchParams.get("test") ?? "";
@@ -24,13 +27,18 @@ export async function GET(req: Request) {
     }
   }
 
-  return NextResponse.json({
-    hash_length: len,
-    hash_prefix: prefix,
-    hash_suffix: suffix,
-    looks_like_bcrypt: looksLikeBcrypt,
-    test_password_provided: test ? "yes" : "no",
-    test_password_matches: matches,
-    session_secret_length: env.ADMIN_SESSION_SECRET.length,
-  });
+  return NextResponse.json(
+    {
+      hash_length: len,
+      hash_prefix: prefix,
+      hash_suffix: suffix,
+      looks_like_bcrypt: looksLikeBcrypt,
+      test_password_provided: test ? "yes" : "no",
+      test_password_received: test ? `"${test}"` : null,
+      test_password_matches: matches,
+      session_secret_length: env.ADMIN_SESSION_SECRET.length,
+      ts: new Date().toISOString(),
+    },
+    { headers: { "Cache-Control": "no-store, max-age=0" } }
+  );
 }
