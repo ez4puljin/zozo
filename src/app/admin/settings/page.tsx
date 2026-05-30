@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { settings } from "@/lib/schema";
 import { eq } from "drizzle-orm";
 import { SettingsForm } from "./SettingsForm";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -9,11 +10,13 @@ export default async function AdminSettingsPage() {
   const [s] = await db.select().from(settings).where(eq(settings.id, 1));
 
   return (
-    <div className="space-y-4 max-w-2xl">
-      <h1 className="text-2xl font-bold">Тохиргоо</h1>
-      <p className="text-sm text-muted-foreground">
-        Үндсэн banner, дэлгүүрийн холбоо барих мэдээлэл.
-      </p>
+    <div className="max-w-2xl">
+      <AdminPageHeader
+        title="Тохиргоо"
+        description="Storefront-д харагдах нийтлэг тохиргоо болон дэлгүүрийн холбоо барих мэдээлэл."
+        breadcrumbs={[{ label: "Хяналт", href: "/admin" }, { label: "Тохиргоо" }]}
+      />
+
       <SettingsForm
         initial={{
           promoBannerText: s?.promoBannerText ?? "Чанарын баталгаатай | Шуурхай хүргэлт",

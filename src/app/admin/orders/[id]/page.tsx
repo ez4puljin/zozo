@@ -7,7 +7,9 @@ import { eq } from "drizzle-orm";
 import { formatDate, formatMNT, formatPhone } from "@/lib/utils";
 import { OrderStatusSelect } from "@/components/admin/OrderStatusSelect";
 import { OrderInternalNotes } from "@/components/admin/OrderInternalNotes";
-import { Phone, ArrowLeft } from "lucide-react";
+import { StatusBadge } from "@/components/admin/StatusBadge";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { Phone, MapPin, CreditCard, Package, MessageSquare, Copy } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -21,61 +23,77 @@ export default async function AdminOrderDetail({ params }: Props) {
   if (!order) notFound();
   const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));
 
-  return (
-    <div className="space-y-6">
-      <Link
-        href="/admin/orders"
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" /> Захиалга
-      </Link>
+  const unitCount = items.reduce((sum, it) => sum + it.unitsPerBundle * it.quantity, 0);
 
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">#{order.orderNumber}</h1>
-          <p className="text-sm text-muted-foreground">{formatDate(order.createdAt)}</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">Төлөв:</span>
-          <OrderStatusSelect orderId={order.id} current={order.status} />
-        </div>
-      </header>
+  const fullAddress = [order.building, order.entrance, order.floor, order.apartment]
+    .filter(Boolean)
+    .join(", ");
+
+  return (
+    <div>
+      <AdminPageHeader
+        title={`#${order.orderNumber}`}
+        description={`${formatDate(order.createdAt)} · ${items.length} төрөл · ${unitCount} ширхэг`}
+        breadcrumbs={[
+          { label: "Хяналт", href: "/admin" },
+          { label: "Захиалга", href: "/admin/orders" },
+          { label: `#${order.orderNumber}` },
+        ]}
+        actions={
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground hidden sm:inline">Төлөв:</span>
+            <OrderStatusSelect orderId={order.id} current={order.status} />
+          </div>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 space-y-4">
-          <section className="rounded-lg border bg-background p-5">
-            <h2 className="text-sm font-semibold mb-3">Захиалсан бараа</h2>
+          {/* Items */}
+          <section className="rounded-xl border bg-background">
+            <header className="flex items-center justify-between px-5 py-3.5 border-b">
+              <h2 className="text-sm font-semibold flex items-center gap-1.5">
+                <Package className="h-3.5 w-3.5" /> Захиалсан бараа
+              </h2>
+              <StatusBadge status={order.status} size="sm" />
+            </header>
             <ul className="divide-y">
               {items.map((it) => (
-                <li key={it.id} className="flex gap-3 py-3 first:pt-0">
+                <li key={it.id} className="flex gap-3 px-5 py-3">
                   {it.productImageSnapshot ? (
-                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
+                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-muted">
                       <Image
                         src={it.productImageSnapshot}
                         alt={it.productNameSnapshot}
                         fill
-                        sizes="64px"
+                        sizes="56px"
                         className="object-cover"
                       />
                     </div>
-                  ) : null}
-                  <div className="flex-1">
-                    <div className="text-sm font-medium">{it.productNameSnapshot}</div>
+                  ) : (
+                    <div className="h-14 w-14 shrink-0 rounded-md bg-muted" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium truncate">
+                      {it.productNameSnapshot}
+                    </div>
                     <div className="text-xs text-muted-foreground mt-0.5">
                       {it.variantLabelSnapshot} × {it.quantity}
                       {it.unitsPerBundle > 1
                         ? ` (нийт ${it.quantity * it.unitsPerBundle} ширхэг)`
                         : ""}
                     </div>
-                    <div className="text-xs text-muted-foreground mt-0.5">
-                      Нэгж: {formatMNT(it.unitPriceMnt)}
+                    <div className="text-[11px] text-muted-foreground mt-0.5 tabular-nums">
+                      {formatMNT(it.unitPriceMnt)} / нэгж
                     </div>
                   </div>
-                  <div className="text-sm font-semibold">{formatMNT(it.lineTotalMnt)}</div>
+                  <div className="text-sm font-semibold tabular-nums shrink-0">
+                    {formatMNT(it.lineTotalMnt)}
+                  </div>
                 </li>
               ))}
             </ul>
-            <div className="mt-3 space-y-1 border-t pt-3 text-sm">
+            <div className="border-t px-5 py-4 space-y-1.5 text-sm">
               <Row label="Дэд дүн" value={formatMNT(order.subtotalMnt)} />
               {order.discountMnt > 0 ? (
                 <Row label="Хэмнэлт" value={`-${formatMNT(order.discountMnt)}`} success />
@@ -84,60 +102,113 @@ export default async function AdminOrderDetail({ params }: Props) {
                 label="Хүргэлт"
                 value={order.shippingMnt > 0 ? formatMNT(order.shippingMnt) : "ҮНЭГҮЙ"}
               />
-              <div className="flex items-baseline justify-between border-t pt-2">
+              <div className="flex items-baseline justify-between border-t pt-3 mt-2">
                 <span className="font-semibold">Нийт</span>
-                <span className="text-lg font-bold">{formatMNT(order.totalMnt)}</span>
+                <span className="text-xl font-bold tabular-nums">
+                  {formatMNT(order.totalMnt)}
+                </span>
               </div>
             </div>
           </section>
 
-          <section className="rounded-lg border bg-background p-5">
-            <h2 className="text-sm font-semibold mb-2">Дотоод тэмдэглэл (зөвхөн админд)</h2>
-            <OrderInternalNotes orderId={order.id} initial={order.internalNotes} />
+          {/* Internal notes */}
+          <section className="rounded-xl border bg-background">
+            <header className="px-5 py-3.5 border-b">
+              <h2 className="text-sm font-semibold flex items-center gap-1.5">
+                <MessageSquare className="h-3.5 w-3.5" /> Дотоод тэмдэглэл
+                <span className="text-[11px] font-normal text-muted-foreground">
+                  (зөвхөн админд харагдана)
+                </span>
+              </h2>
+            </header>
+            <div className="px-5 py-4">
+              <OrderInternalNotes orderId={order.id} initial={order.internalNotes} />
+            </div>
           </section>
         </div>
 
-        <aside className="space-y-4">
-          <section className="rounded-lg border bg-background p-5">
-            <h2 className="text-sm font-semibold mb-3">Хэрэглэгч</h2>
-            <div className="text-sm">
-              <div className="font-medium">
-                {order.lastName} {order.firstName}
+        {/* Sidebar — sticky customer info on desktop */}
+        <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+          {/* Call CTA card */}
+          <section className="rounded-xl border bg-background overflow-hidden">
+            <header className="px-5 py-3.5 border-b">
+              <h2 className="text-sm font-semibold">Хэрэглэгч</h2>
+            </header>
+            <div className="px-5 py-4 space-y-3">
+              <div>
+                <div className="text-xs text-muted-foreground">Хүлээн авагч</div>
+                <div className="font-semibold text-sm mt-0.5">
+                  {order.lastName} {order.firstName}
+                </div>
               </div>
               <a
                 href={`tel:${order.phone}`}
-                className="mt-2 inline-flex items-center gap-2 rounded-md bg-foreground text-background px-3 py-2 text-xs font-semibold hover:opacity-90"
+                className="flex items-center justify-center gap-2 w-full rounded-md bg-foreground text-background px-4 py-3 text-sm font-semibold hover:opacity-90 transition active:scale-[0.99]"
               >
-                <Phone className="h-3.5 w-3.5" />
-                Залгах: {formatPhone(order.phone)}
+                <Phone className="h-4 w-4" />
+                Залгах · {formatPhone(order.phone)}
               </a>
               {order.additionalPhone ? (
-                <div className="mt-2 text-xs text-muted-foreground">
-                  Нэмэлт: <a href={`tel:${order.additionalPhone}`}>{formatPhone(order.additionalPhone)}</a>
+                <a
+                  href={`tel:${order.additionalPhone}`}
+                  className="flex items-center justify-center gap-1.5 w-full rounded-md border px-4 py-2 text-xs text-muted-foreground hover:bg-muted transition"
+                >
+                  <Phone className="h-3 w-3" />
+                  Нэмэлт: {formatPhone(order.additionalPhone)}
+                </a>
+              ) : null}
+            </div>
+          </section>
+
+          {/* Address */}
+          <section className="rounded-xl border bg-background overflow-hidden">
+            <header className="px-5 py-3.5 border-b flex items-center justify-between">
+              <h2 className="text-sm font-semibold flex items-center gap-1.5">
+                <MapPin className="h-3.5 w-3.5" /> Хүргэлтийн хаяг
+              </h2>
+            </header>
+            <div className="px-5 py-4 text-sm">
+              <div className="font-medium">{order.district}</div>
+              {order.khoroo ? (
+                <div className="text-muted-foreground mt-1">{order.khoroo}</div>
+              ) : null}
+              {fullAddress ? (
+                <div className="text-muted-foreground mt-1">{fullAddress}</div>
+              ) : null}
+              {order.notes ? (
+                <div className="mt-3 rounded-md bg-muted/40 p-2.5 text-xs italic">
+                  💬 {order.notes}
                 </div>
               ) : null}
             </div>
           </section>
 
-          <section className="rounded-lg border bg-background p-5">
-            <h2 className="text-sm font-semibold mb-3">Хүргэлтийн хаяг</h2>
-            <div className="text-sm leading-relaxed text-muted-foreground">
-              <div className="text-foreground">{order.district}</div>
-              {order.khoroo ? <div>{order.khoroo}</div> : null}
-              {[order.building, order.entrance, order.floor, order.apartment]
-                .filter(Boolean)
-                .join(", ") || ""}
-              {order.notes ? (
-                <div className="mt-2 italic">Тэмдэглэл: {order.notes}</div>
-              ) : null}
-            </div>
-          </section>
-
-          <section className="rounded-lg border bg-background p-5 text-sm">
-            <h2 className="font-semibold mb-2">Төлбөр</h2>
-            <div className="text-muted-foreground">АВАХДАА ТӨЛӨХ</div>
-            <div className="mt-3 text-xs text-muted-foreground">
-              Төлөв: {orderStatusLabel[order.status]}
+          {/* Payment & status */}
+          <section className="rounded-xl border bg-background overflow-hidden">
+            <header className="px-5 py-3.5 border-b">
+              <h2 className="text-sm font-semibold flex items-center gap-1.5">
+                <CreditCard className="h-3.5 w-3.5" /> Төлбөр ба төлөв
+              </h2>
+            </header>
+            <div className="px-5 py-4 text-sm space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground text-xs">Төлбөрийн арга</span>
+                <span className="font-semibold uppercase tracking-wider text-xs">
+                  Авахдаа төлөх
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground text-xs">Одоогийн төлөв</span>
+                <StatusBadge status={order.status} size="sm" />
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground text-xs">Үүсгэсэн</span>
+                <span className="text-xs tabular-nums">{formatDate(order.createdAt)}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground text-xs">Шинэчилсэн</span>
+                <span className="text-xs tabular-nums">{formatDate(order.updatedAt)}</span>
+              </div>
             </div>
           </section>
         </aside>
@@ -150,7 +221,9 @@ function Row({ label, value, success }: { label: string; value: string; success?
   return (
     <div className="flex justify-between">
       <span className="text-muted-foreground">{label}</span>
-      <span className={success ? "text-success font-semibold" : ""}>{value}</span>
+      <span className={success ? "text-success font-semibold tabular-nums" : "tabular-nums"}>
+        {value}
+      </span>
     </div>
   );
 }
