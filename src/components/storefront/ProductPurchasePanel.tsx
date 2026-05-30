@@ -142,13 +142,13 @@ export function ProductPurchasePanel({
 
       <button
         onClick={() => handleAdd(true)}
-        className="block w-full rounded-md bg-foreground py-4 text-sm font-semibold uppercase tracking-wider text-background hover:opacity-90 transition"
+        className="block w-full rounded-full bg-foreground py-4 text-sm font-semibold uppercase tracking-wider text-background hover:opacity-90 active:scale-[0.99] transition"
       >
         Захиалах
       </button>
       <button
         onClick={() => handleAdd(false)}
-        className="block w-full rounded-md border py-3 text-sm font-medium hover:bg-muted transition"
+        className="block w-full rounded-full border py-3 text-sm font-medium hover:bg-muted transition"
       >
         Сагсанд нэмэх
       </button>

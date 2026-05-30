@@ -33,9 +33,18 @@ export default async function CatalogPage({ searchParams }: Props) {
   const list = await getActiveProductsList({ sort, available, min, max });
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-      <header className="text-center mb-10">
-        <h1 className="text-4xl font-bold tracking-tight">Бараа</h1>
+    <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+      <header className="mb-8">
+        <div className="zz-eyebrow mb-2">Бүх бараа</div>
+        <h1
+          className="font-bold leading-tight"
+          style={{
+            fontSize: "clamp(1.75rem, 3vw, 2.25rem)",
+            letterSpacing: "-0.025em",
+          }}
+        >
+          Бараа
+        </h1>
       </header>
 
       <CatalogControls
@@ -51,7 +60,7 @@ export default async function CatalogPage({ searchParams }: Props) {
           Илэрц олдсонгүй.
         </div>
       ) : (
-        <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-7">
           {list.map((p) => (
             <ProductCard
               key={p.id}

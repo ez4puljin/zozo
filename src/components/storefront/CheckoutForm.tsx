@@ -307,7 +307,7 @@ export function CheckoutForm() {
         <button
           type="submit"
           disabled={pending}
-          className="block w-full rounded-md bg-foreground py-4 text-sm font-semibold uppercase tracking-wider text-background hover:opacity-90 disabled:opacity-50 transition"
+          className="block w-full rounded-full bg-foreground py-4 text-sm font-semibold uppercase tracking-wider text-background hover:opacity-90 active:scale-[0.99] disabled:opacity-50 transition"
         >
           {pending ? "Илгээж байна…" : "Захиалах"}
         </button>

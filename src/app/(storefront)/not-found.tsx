@@ -10,7 +10,7 @@ export default function NotFound() {
       </p>
       <Link
         href="/"
-        className="mt-6 inline-flex rounded-md bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition"
+        className="mt-6 inline-flex rounded-full bg-foreground px-7 py-3 text-sm font-semibold uppercase tracking-wider text-background hover:opacity-90 active:scale-[0.99] transition"
       >
         Нүүр хуудас руу буцах
       </Link>

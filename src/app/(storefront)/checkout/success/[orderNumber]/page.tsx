@@ -95,7 +95,7 @@ export default async function SuccessPage({ params }: Props) {
       <div className="mt-8 text-center">
         <Link
           href="/collections/all"
-          className="inline-flex rounded-md border px-6 py-3 text-sm font-medium hover:bg-muted transition"
+          className="inline-flex rounded-full border px-6 py-3 text-sm font-medium hover:bg-muted transition"
         >
           Үргэлжлүүлэн худалдаа хийх
         </Link>

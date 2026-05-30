@@ -14,10 +14,21 @@ export default async function ContactPage() {
 
   return (
     <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
-      <h1 className="text-4xl font-bold tracking-tight text-center">Холбоо барих</h1>
-      <p className="mt-3 text-center text-sm text-muted-foreground">
-        Захиалга, бараа, ерөнхий асуултын талаар манайхтай холбогдоорой.
-      </p>
+      <header className="text-center">
+        <div className="zz-eyebrow zz-eyebrow-hero mb-3">Бидэнтэй холбогдох</div>
+        <h1
+          className="font-bold leading-tight"
+          style={{
+            fontSize: "clamp(2rem, 4vw, 2.5rem)",
+            letterSpacing: "-0.025em",
+          }}
+        >
+          Холбоо барих
+        </h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Захиалга, бараа, ерөнхий асуултын талаар манайхтай холбогдоорой.
+        </p>
+      </header>
 
       <div className="mt-12 grid gap-6 sm:grid-cols-2">
         {cfg?.shopPhone ? (

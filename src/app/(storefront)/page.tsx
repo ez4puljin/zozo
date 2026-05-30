@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { products, productImages } from "@/lib/schema";
 import { eq, asc, and } from "drizzle-orm";
 import { ProductCard } from "@/components/storefront/ProductCard";
+import { TrustStrip } from "@/components/storefront/TrustStrip";
 
 export const revalidate = 60;
 
@@ -21,7 +22,6 @@ async function getFeatured() {
     .orderBy(asc(products.position))
     .limit(8);
 
-  // Fetch primary image per product
   const withImages = await Promise.all(
     rows.map(async (p) => {
       const img = await db
@@ -49,47 +49,66 @@ export default async function Home() {
 
   return (
     <>
-      {/* Hero */}
+      {/* Hero — editorial */}
       <section className="border-b">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24 text-center">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
-            Чанартай бараа, <br className="hidden sm:inline" />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 lg:py-28 text-center">
+          <div className="zz-eyebrow zz-eyebrow-hero mb-5">
+            Авахдаа төлөх · Шуурхай хүргэлт
+          </div>
+          <h1
+            className="font-bold leading-[0.98]"
+            style={{
+              fontSize: "clamp(2.75rem, 6.5vw, 5rem)",
+              letterSpacing: "-0.035em",
+            }}
+          >
+            Чанартай бараа,
+            <br />
             шуурхай хүргэлт.
           </h1>
-          <p className="mt-4 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="mx-auto mt-6 max-w-[540px] text-lg leading-relaxed text-muted-foreground">
             Зөвхөн өнөөдөр захиалбал — хүргэлт үнэгүй. Авахдаа төлөх боломжтой.
           </p>
-          <div className="mt-8 flex justify-center gap-3">
-            <Link
-              href="/collections/all"
-              className="rounded-md bg-foreground px-6 py-3 text-sm font-semibold uppercase tracking-wider text-background hover:opacity-90 transition"
-            >
+          <div className="mt-9">
+            <Link href="/collections/all" className="zz-btn-pill">
               Бараа үзэх
             </Link>
           </div>
         </div>
       </section>
 
+      {/* Trust strip */}
+      <TrustStrip />
+
       {/* Featured */}
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            Шилмэл бараа
-          </h2>
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
+        <div className="mb-10 flex items-end justify-between">
+          <div>
+            <div className="zz-eyebrow mb-2">Шилдэг сонголт</div>
+            <h2
+              className="font-bold leading-tight"
+              style={{
+                fontSize: "clamp(1.75rem, 3vw, 2.25rem)",
+                letterSpacing: "-0.025em",
+              }}
+            >
+              Шилмэл бараа
+            </h2>
+          </div>
           <Link
             href="/collections/all"
-            className="text-sm underline underline-offset-4 hover:opacity-70"
+            className="text-sm underline underline-offset-4 hover:opacity-70 transition"
           >
             Бүгдийг үзэх →
           </Link>
         </div>
 
         {featured.length === 0 ? (
-          <div className="text-center text-sm text-muted-foreground py-12 border rounded-lg">
+          <div className="text-center text-sm text-muted-foreground py-16 border rounded-lg">
             Бараа удахгүй нэмэгдэнэ. (Admin-аас бараа нэмнэ үү.)
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-7">
             {featured.map((p) => (
               <ProductCard
                 key={p.id}

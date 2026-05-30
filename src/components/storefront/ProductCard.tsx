@@ -20,29 +20,28 @@ export function ProductCard({
   discountPercent,
 }: ProductCardProps) {
   return (
-    <Link
-      href={`/products/${slug}`}
-      className="group block overflow-hidden rounded-lg border bg-background hover:shadow-md transition"
-    >
-      <div className="relative aspect-square overflow-hidden bg-muted">
+    <Link href={`/products/${slug}`} className="zz-pcard group block">
+      <div className="zz-pcard-img relative aspect-[4/5] overflow-hidden rounded-xl bg-muted">
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={name}
             fill
             sizes="(min-width:1024px) 25vw, (min-width:640px) 50vw, 100vw"
-            className="object-cover transition group-hover:scale-[1.02]"
+            className="object-cover"
           />
         ) : null}
         {discountPercent > 0 ? (
-          <span className="absolute bottom-3 left-3 rounded-md bg-foreground text-background px-2 py-1 text-[11px] font-semibold uppercase tracking-wider">
+          <span className="absolute top-3 left-3 rounded-full bg-foreground/90 backdrop-blur-sm px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-background">
             -{discountPercent}% хямдрал
           </span>
         ) : null}
       </div>
-      <div className="p-4">
-        <h3 className="text-sm font-medium line-clamp-2">{name}</h3>
-        <div className="mt-2 flex items-baseline gap-2">
+      <div className="px-1 pt-4">
+        <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug tracking-tight">
+          {name}
+        </h3>
+        <div className="mt-1.5 flex items-baseline gap-2">
           <span className="text-base font-bold">{formatMNT(priceMnt)}</span>
           {compareAtMnt && compareAtMnt > priceMnt ? (
             <span className="text-xs text-muted-foreground line-through-thin">

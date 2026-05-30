@@ -149,7 +149,7 @@ export function CartDrawer() {
               <Link
                 href="/checkout"
                 onClick={closeCart}
-                className="flex w-full items-center justify-center rounded-md bg-foreground py-3 text-sm font-semibold uppercase tracking-wider text-background hover:opacity-90 transition"
+                className="flex w-full items-center justify-center rounded-full bg-foreground py-3.5 text-sm font-semibold uppercase tracking-wider text-background hover:opacity-90 active:scale-[0.99] transition"
               >
                 Захиалах
               </Link>
