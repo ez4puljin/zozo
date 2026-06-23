@@ -158,6 +158,60 @@ const VARIANT_PRESETS = [
       },
     ],
   },
+  {
+    label: "Хувцасны хэмжээ",
+    description: "S / M / L / XL — нэг үнээр",
+    icon: "👕",
+    build: (basePrice: number): VariantData[] =>
+      ["S", "M", "L", "XL"].map((size, i) => ({
+        ...emptyVariant(),
+        label: size,
+        unitsPerBundle: 1,
+        priceMnt: basePrice,
+        compareAtPriceMnt: null,
+        discountPercent: 0,
+        isDefault: i === 1, // M is default
+        position: i,
+      })),
+  },
+  {
+    label: "Хэмжээ — өөр үнэтэй",
+    description: "Жиш: Цүнхэн бокс 1м25 / 1м45 / 1м65",
+    icon: "📐",
+    build: (basePrice: number): VariantData[] => [
+      {
+        ...emptyVariant(),
+        label: "Жижиг",
+        unitsPerBundle: 1,
+        priceMnt: basePrice,
+        compareAtPriceMnt: null,
+        discountPercent: 0,
+        isDefault: true,
+        position: 0,
+      },
+      {
+        ...emptyVariant(),
+        label: "Дунд",
+        unitsPerBundle: 1,
+        priceMnt: Math.round(basePrice * 1.15),
+        compareAtPriceMnt: null,
+        discountPercent: 0,
+        isDefault: false,
+        position: 1,
+      },
+      {
+        ...emptyVariant(),
+        label: "Том",
+        unitsPerBundle: 1,
+        priceMnt: Math.round(basePrice * 1.32),
+        compareAtPriceMnt: null,
+        discountPercent: 0,
+        isDefault: false,
+        position: 2,
+        badge: "ТОМ",
+      },
+    ],
+  },
 ];
 
 export function ProductForm({ initial }: { initial: ProductFormInitial }) {
@@ -407,28 +461,31 @@ export function ProductForm({ initial }: { initial: ProductFormInitial }) {
             <InfoBox>
               <strong>📚 Энэ хэсэг юу вэ?</strong>
               <br />
-              Нэг бүтээгдэхүүний өөр өөр <b>багц буюу тооны</b> сонголтыг энд тохируулна. Жишээ:
+              Нэг бүтээгдэхүүний өөр өөр сонголтыг энд тохируулна. <b>2 төрөл</b> байна:
               <ul className="mt-1 ml-4 list-disc">
                 <li>
-                  <b>1 ширхэг</b> — энгийн худалдаа
+                  <b>Хэмжээ / Size</b> — нэг бараа, өөр хэмжээ (S/M/L, эсвэл 1м25см/1м45см/1м65см).
+                  Хэрэглэгчид <b>авсаархан товч</b> хэлбэрээр харагдана.
                 </li>
                 <li>
-                  <b>2 авбал 1 БЭЛЭГ</b> — хоёрын үнээр гурван ширхэг авах (хэрэглэгчид хамгийн их сонгодог)
+                  <b>Багц / Урамшуулал</b> — нэг бараа, олон ширхгийн багц (1 ширхэг, 2+1, 3+1...).
+                  Хэрэглэгчид <b>карт</b> хэлбэрээр харагдана.
                 </li>
               </ul>
               <br />
               <span className="text-xs">
-                💡 <b>Зөвлөмж:</b> Доорх &ldquo;Урамшууллын загвар&rdquo;-аас сонговол бүх талбар автомат бөглөгдөнө.
+                💡 <b>Зөвлөмж:</b> Доорх &ldquo;Загвар&rdquo;-аас сонговол бүх талбар автомат бөглөгдөнө.
+                Системийн UI нь сонголтын төрлийг автомат таних болно (бүх сонголт 1 ширхэгтэй бол хэмжээний горимд шилждэг).
               </span>
             </InfoBox>
 
             {/* Preset templates */}
             <div className="space-y-2">
               <div className="text-xs font-semibold flex items-center gap-1">
-                <Sparkles className="h-3.5 w-3.5" /> Урамшууллын загвар (нэг товч дарахад бүх
-                сонголт автомат бөглөгдөнө)
+                <Sparkles className="h-3.5 w-3.5" /> Загвар (нэг товч дарахад бүх сонголт автомат
+                бөглөгдөнө)
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {VARIANT_PRESETS.map((p) => (
                   <button
                     key={p.label}

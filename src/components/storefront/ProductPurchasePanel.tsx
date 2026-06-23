@@ -109,9 +109,13 @@ export function ProductPurchasePanel({
       </div>
 
       <div>
-        <div className="text-xs font-semibold uppercase tracking-wider text-center py-2 border-y mb-3">
-          Энэ 7 хоногийн урамшуулал
-        </div>
+        {variants.length > 1 ? (
+          <div className="text-xs font-semibold uppercase tracking-wider text-center py-2 border-y mb-3">
+            {variants.every((v) => v.unitsPerBundle === 1)
+              ? "Хэмжээгээ сонгох"
+              : "Энэ 7 хоногийн урамшуулал"}
+          </div>
+        ) : null}
         <BundleSelector
           variants={variants}
           selectedId={selectedId}
