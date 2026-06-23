@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { sqliteTable, text, integer, real, uniqueIndex, index } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, real, blob, uniqueIndex, index } from "drizzle-orm/sqlite-core";
 
 // ---------- products ----------
 export const products = sqliteTable(
@@ -189,6 +189,19 @@ export const dailyCounter = sqliteTable("daily_counter", {
   dayKey: text("day_key").primaryKey(), // e.g. "260527"
   lastSeq: integer("last_seq").notNull().default(0),
 });
+
+// ---------- media (self-hosted image storage, served via /api/media/[id]) ----------
+export const media = sqliteTable("media", {
+  id: text("id").primaryKey(),
+  mime: text("mime").notNull(),
+  data: blob("data", { mode: "buffer" }).notNull(),
+  size: integer("size").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
+export type Media = typeof media.$inferSelect;
 
 // ---------- Order status Mongolian labels ----------
 export const orderStatusLabel: Record<OrderStatus, string> = {

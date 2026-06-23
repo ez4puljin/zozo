@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
-import { put } from "@vercel/blob";
+import { db } from "@/lib/db";
+import { media } from "@/lib/schema";
 import { verifyAdminSession } from "@/lib/auth";
-import { env } from "@/lib/env";
+import { newId } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_SIZE = 4 * 1024 * 1024; // 4 MB
 const ALLOWED_TYPES = new Set([
   "image/jpeg",
   "image/jpg",
@@ -15,27 +16,14 @@ const ALLOWED_TYPES = new Set([
   "image/gif",
 ]);
 
+/**
+ * Self-hosted image upload: stores the bytes in the `media` table (Turso/SQLite)
+ * and returns a relative URL `/api/media/<id>` that is served back by the
+ * companion GET route. No external blob service / dashboard setup required.
+ */
 export async function POST(req: Request) {
   if (!(await verifyAdminSession())) {
     return NextResponse.json({ error: "Эрхгүй" }, { status: 401 });
-  }
-
-  // Modern Vercel Blob auto-injects credentials in the runtime
-  // (no BLOB_READ_WRITE_TOKEN required when the Blob store is connected to the
-  // project). The SDK falls back to BLOB_READ_WRITE_TOKEN for local dev.
-  const hasBlobStore =
-    !!env.BLOB_READ_WRITE_TOKEN ||
-    !!process.env.BLOB_STORE_ID ||
-    !!process.env.VERCEL;
-
-  if (!hasBlobStore) {
-    return NextResponse.json(
-      {
-        error:
-          "Vercel Blob storage холбогдоогүй байна. Vercel dashboard → Storage → Blob үүсгээд project-тэй холбоно уу.",
-      },
-      { status: 500 }
-    );
   }
 
   const formData = await req.formData();
@@ -45,7 +33,7 @@ export async function POST(req: Request) {
   }
   if (file.size > MAX_SIZE) {
     return NextResponse.json(
-      { error: "Файлын хэмжээ хэт том (5MB-ээс ихгүй)" },
+      { error: "Файлын хэмжээ хэт том (4MB-ээс ихгүй)" },
       { status: 400 }
     );
   }
@@ -56,29 +44,19 @@ export async function POST(req: Request) {
     );
   }
 
-  // Unique blob path
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-  const blobPath = `products/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
-
   try {
-    // Pass `token` only if explicitly set (local dev). On Vercel runtime the
-    // SDK uses the auto-injected credentials from the connected Blob store.
-    const blob = await put(blobPath, file, {
-      access: "public",
-      contentType: file.type,
-      ...(env.BLOB_READ_WRITE_TOKEN ? { token: env.BLOB_READ_WRITE_TOKEN } : {}),
+    const buf = Buffer.from(await file.arrayBuffer());
+    const id = newId();
+    await db.insert(media).values({
+      id,
+      mime: file.type,
+      data: buf,
+      size: buf.length,
     });
-    return NextResponse.json({ url: blob.url });
+    return NextResponse.json({ url: `/api/media/${id}` });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Upload алдаа";
     console.error("[upload]", e);
-    return NextResponse.json(
-      {
-        error: msg.includes("token") || msg.includes("auth")
-          ? "Vercel Blob authentication алдаа. BLOB_READ_WRITE_TOKEN-г шалгана уу эсвэл Blob store-ыг дахин холбоно уу."
-          : msg,
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
