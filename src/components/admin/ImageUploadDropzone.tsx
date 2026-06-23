@@ -93,9 +93,10 @@ export function ImageUploadDropzone({ onUpload }: Props) {
       {error ? (
         <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {error}
-          {error.includes("BLOB_READ_WRITE_TOKEN") ? (
+          {error.includes("Blob") || error.includes("token") ? (
             <div className="mt-1 text-xs">
-              Vercel dashboard → Storage → Create Blob → token-ыг env-д тохируулна уу.
+              Vercel dashboard → Storage → Blob үүсгээд project-тэй холбоно уу,
+              эсвэл доорх URL талбараар зургийн линкийг шууд оруулна уу.
             </div>
           ) : null}
         </div>

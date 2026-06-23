@@ -19,11 +19,20 @@ export async function POST(req: Request) {
   if (!(await verifyAdminSession())) {
     return NextResponse.json({ error: "Эрхгүй" }, { status: 401 });
   }
-  if (!env.BLOB_READ_WRITE_TOKEN) {
+
+  // Modern Vercel Blob auto-injects credentials in the runtime
+  // (no BLOB_READ_WRITE_TOKEN required when the Blob store is connected to the
+  // project). The SDK falls back to BLOB_READ_WRITE_TOKEN for local dev.
+  const hasBlobStore =
+    !!env.BLOB_READ_WRITE_TOKEN ||
+    !!process.env.BLOB_STORE_ID ||
+    !!process.env.VERCEL;
+
+  if (!hasBlobStore) {
     return NextResponse.json(
       {
         error:
-          "BLOB_READ_WRITE_TOKEN тохиргоо байхгүй. Vercel-д Blob storage үүсгээд token-оо тохируулна уу.",
+          "Vercel Blob storage холбогдоогүй байна. Vercel dashboard → Storage → Blob үүсгээд project-тэй холбоно уу.",
       },
       { status: 500 }
     );
@@ -52,14 +61,24 @@ export async function POST(req: Request) {
   const blobPath = `products/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
 
   try {
+    // Pass `token` only if explicitly set (local dev). On Vercel runtime the
+    // SDK uses the auto-injected credentials from the connected Blob store.
     const blob = await put(blobPath, file, {
       access: "public",
-      token: env.BLOB_READ_WRITE_TOKEN,
       contentType: file.type,
+      ...(env.BLOB_READ_WRITE_TOKEN ? { token: env.BLOB_READ_WRITE_TOKEN } : {}),
     });
     return NextResponse.json({ url: blob.url });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Upload алдаа";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("[upload]", e);
+    return NextResponse.json(
+      {
+        error: msg.includes("token") || msg.includes("auth")
+          ? "Vercel Blob authentication алдаа. BLOB_READ_WRITE_TOKEN-г шалгана уу эсвэл Blob store-ыг дахин холбоно уу."
+          : msg,
+      },
+      { status: 500 }
+    );
   }
 }
