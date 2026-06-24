@@ -26,7 +26,14 @@ const variantInput = z.object({
 
 const imageInput = z.object({
   id: z.string().optional(),
-  url: z.string().url("Зургийн URL буруу"),
+  // Accept either an uploaded relative path (/api/media/<id>) or an absolute
+  // http(s) URL pasted by the admin.
+  url: z
+    .string()
+    .refine(
+      (v) => v.startsWith("/api/media/") || /^https?:\/\//i.test(v),
+      "Зургийн URL буруу"
+    ),
   alt: z.string().nullable().optional(),
   position: z.coerce.number().int().default(0),
   isPrimary: z.boolean().default(false),
