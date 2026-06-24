@@ -5,7 +5,7 @@ export function TrustStrip() {
     <div className="border-y">
       <div className="mx-auto grid max-w-7xl grid-cols-1 sm:grid-cols-3">
         <Cell icon={<Truck className="h-4 w-4" />}>
-          Шуурхай хүргэлт <span className="text-muted-foreground">— Үнэгүй</span>
+          Шуурхай хүргэлт <span className="text-muted-foreground">— Хотод 6,000₮</span>
         </Cell>
         <Cell icon={<Wallet className="h-4 w-4" />}>Авахдаа төлөх</Cell>
         <Cell icon={<ShieldCheck className="h-4 w-4" />}>Чанарын баталгаатай</Cell>

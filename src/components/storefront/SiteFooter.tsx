@@ -35,7 +35,7 @@ export function SiteFooter() {
           <div>
             <div className="text-sm font-semibold">Худалдан авах</div>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <li>Шуурхай хүргэлт — Үнэгүй</li>
+              <li>Шуурхай хүргэлт — Хотод 6,000₮</li>
               <li>Төлбөр — Авахдаа төлөх</li>
               <li>Чанарын баталгаатай</li>
             </ul>

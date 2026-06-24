@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { X, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { cn, formatMNT } from "@/lib/utils";
+import { SHIPPING_LABEL } from "@/lib/constants";
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQty, totals } = useCart();
@@ -134,6 +135,14 @@ export function CartDrawer() {
             </ul>
 
             <div className="border-t px-5 py-4 space-y-3">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Дэд дүн</span>
+                <span>{formatMNT(t.subtotalMnt)}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Хүргэлт ({SHIPPING_LABEL})</span>
+                <span className="font-medium">{formatMNT(t.shippingMnt)}</span>
+              </div>
               {t.savingsMnt > 0 && (
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Хэмнэлт</span>
@@ -142,8 +151,8 @@ export function CartDrawer() {
                   </span>
                 </div>
               )}
-              <div className="flex items-center justify-between">
-                <span className="text-base font-semibold">Нийт</span>
+              <div className="flex items-center justify-between border-t pt-3">
+                <span className="text-base font-semibold">Нийт төлөх</span>
                 <span className="text-lg font-bold">{formatMNT(t.totalMnt)}</span>
               </div>
               <Link
@@ -154,7 +163,7 @@ export function CartDrawer() {
                 Захиалах
               </Link>
               <div className="text-center text-xs text-muted-foreground">
-                Авахдаа төлөх · Шуурхай хүргэлт үнэгүй
+                Авахдаа төлөх · Захиалга + хүргэлтийн төлбөрийг хүлээн авахдаа төлнө
               </div>
             </div>
           </>

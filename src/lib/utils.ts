@@ -16,6 +16,11 @@ export function formatPhone(phone: string): string {
   return phone;
 }
 
+/** Display a customer's name. Овог optional — falls back to нэр alone. */
+export function fullName(firstName: string, lastName?: string | null): string {
+  return [firstName, lastName].filter(Boolean).join(" ").trim() || firstName;
+}
+
 export function formatDate(d: Date | number | string): string {
   const date = typeof d === "object" ? d : new Date(d);
   return new Intl.DateTimeFormat("mn-MN", {

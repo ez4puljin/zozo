@@ -17,6 +17,7 @@ import { resend } from "@/lib/email/client";
 import { NewOrderAdmin } from "@/lib/email/templates/NewOrderAdmin";
 import { env } from "@/lib/env";
 import { formatDate, newId } from "@/lib/utils";
+import { SHIPPING_MNT } from "@/lib/constants";
 import { createHash } from "node:crypto";
 
 export type CreateOrderResult =
@@ -116,7 +117,7 @@ export async function createOrderAction(input: unknown): Promise<CreateOrderResu
       };
     });
 
-    const shipping = 0;
+    const shipping = SHIPPING_MNT;
     const discount = Math.max(0, compareAtSubtotal - subtotal);
     const total = subtotal + shipping;
 
@@ -140,7 +141,7 @@ export async function createOrderAction(input: unknown): Promise<CreateOrderResu
         status: "new",
         phone: data.customer.phone,
         firstName: data.customer.firstName,
-        lastName: data.customer.lastName,
+        lastName: data.customer.lastName || "",
         country: "MN",
         district: data.customer.district,
         khoroo: data.customer.khoroo || null,
@@ -201,7 +202,7 @@ export async function createOrderAction(input: unknown): Promise<CreateOrderResu
             createdAtText: formatDate(new Date()),
             customer: {
               firstName: data.customer.firstName,
-              lastName: data.customer.lastName,
+              lastName: data.customer.lastName || "",
               phone: data.customer.phone,
               additionalPhone: data.customer.additionalPhone || undefined,
               district: data.customer.district,

@@ -104,7 +104,7 @@ export function NewOrderAdmin(props: Props) {
           </Heading>
           <Text style={{ margin: "0 0 4px", fontSize: 14 }}>
             <b>
-              {customer.lastName} {customer.firstName}
+              {[customer.firstName, customer.lastName].filter(Boolean).join(" ")}
             </b>
           </Text>
           <Text style={{ margin: "0 0 4px", fontSize: 14 }}>

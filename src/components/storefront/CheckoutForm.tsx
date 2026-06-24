@@ -8,6 +8,7 @@ import { checkoutFormSchema, type CheckoutFormData } from "@/lib/checkout/schema
 import { useCart } from "@/lib/cart/store";
 import { createOrderAction } from "@/server/actions/checkout";
 import { formatMNT, cn } from "@/lib/utils";
+import { SHIPPING_MNT, SHIPPING_LABEL } from "@/lib/constants";
 import Image from "next/image";
 import { Check } from "lucide-react";
 
@@ -56,7 +57,6 @@ export function CheckoutForm() {
         const fields: (keyof SavedProfile)[] = [
           "phone",
           "firstName",
-          "lastName",
           "district",
           "khoroo",
           "building",
@@ -138,7 +138,6 @@ export function CheckoutForm() {
         const profile: SavedProfile = {
           phone: form.phone,
           firstName: form.firstName,
-          lastName: form.lastName,
           district: form.district,
           khoroo: form.khoroo || undefined,
           building: form.building || undefined,
@@ -214,14 +213,13 @@ export function CheckoutForm() {
             <span className="font-medium">Улс:</span> Монгол
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Нэр" error={errors.firstName?.message} required>
-              <input {...register("firstName")} className={inputCls(!!errors.firstName)} />
-            </Field>
-            <Field label="Овог" error={errors.lastName?.message} required>
-              <input {...register("lastName")} className={inputCls(!!errors.lastName)} />
-            </Field>
-          </div>
+          <Field label="Нэр" error={errors.firstName?.message} required>
+            <input
+              {...register("firstName")}
+              className={inputCls(!!errors.firstName)}
+              placeholder="Таны нэр"
+            />
+          </Field>
 
           <Field label="Дүүрэг/Аймаг" error={errors.district?.message} required>
             <input {...register("district")} className={inputCls(!!errors.district)} />
@@ -285,8 +283,8 @@ export function CheckoutForm() {
         <section>
           <h2 className="text-lg font-semibold mb-3">Хүргэлтийн төрөл</h2>
           <div className="flex items-center justify-between rounded-md border bg-muted/30 px-3 py-3 text-sm">
-            <span className="font-medium">ШУУРХАЙ ХҮРГЭЛТ</span>
-            <span className="font-semibold uppercase">Үнэгүй</span>
+            <span className="font-medium">ШУУРХАЙ ХҮРГЭЛТ · {SHIPPING_LABEL}</span>
+            <span className="font-semibold">{formatMNT(SHIPPING_MNT)}</span>
           </div>
         </section>
 
@@ -338,12 +336,12 @@ export function CheckoutForm() {
           </ul>
           <div className="space-y-1.5 border-t pt-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Нийт</span>
+              <span className="text-muted-foreground">Дэд дүн</span>
               <span>{formatMNT(t.subtotalMnt)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Хүргэлт</span>
-              <span className="uppercase font-medium">Үнэгүй</span>
+              <span className="text-muted-foreground">Хүргэлт ({SHIPPING_LABEL})</span>
+              <span className="font-medium">{formatMNT(t.shippingMnt)}</span>
             </div>
             {t.savingsMnt > 0 ? (
               <div className="flex justify-between text-success">
@@ -352,8 +350,8 @@ export function CheckoutForm() {
               </div>
             ) : null}
             <div className="flex items-baseline justify-between border-t pt-2">
-              <span className="font-semibold">Total</span>
-              <span className="text-lg font-bold">MNT {formatMNT(t.totalMnt)}</span>
+              <span className="font-semibold">Нийт төлөх</span>
+              <span className="text-lg font-bold">{formatMNT(t.totalMnt)}</span>
             </div>
           </div>
         </div>

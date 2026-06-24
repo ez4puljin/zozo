@@ -158,7 +158,7 @@ export function ProductPurchasePanel({
       </button>
 
       <div className="flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2.5 text-xs">
-        <span className="font-medium">🚚 Зөвхөн өнөөдөр захиалбал хүргэлт ҮНЭГҮЙ!</span>
+        <span className="font-medium">🚚 Хотын А бүсэд хүргэлт 6,000₮ · Авахдаа төлөх</span>
       </div>
     </div>
   );

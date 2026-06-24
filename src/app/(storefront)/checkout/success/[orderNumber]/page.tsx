@@ -2,9 +2,10 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
-import { orders, orderItems } from "@/lib/schema";
+import { orders, orderItems, settings } from "@/lib/schema";
 import { eq } from "drizzle-orm";
-import { formatDate, formatMNT } from "@/lib/utils";
+import { formatDate, formatMNT, formatPhone } from "@/lib/utils";
+import { SHIPPING_LABEL } from "@/lib/constants";
 import { Check } from "lucide-react";
 import Image from "next/image";
 
@@ -23,6 +24,8 @@ export default async function SuccessPage({ params }: Props) {
   if (!order) notFound();
 
   const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));
+  const [cfg] = await db.select().from(settings).where(eq(settings.id, 1));
+  const shopPhone = cfg?.shopPhone ?? "86058979";
 
   return (
     <section className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
@@ -67,6 +70,10 @@ export default async function SuccessPage({ params }: Props) {
         </ul>
 
         <div className="border-t pt-3 space-y-1 text-sm">
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Дэд дүн</span>
+            <span>{formatMNT(order.subtotalMnt)}</span>
+          </div>
           {order.discountMnt > 0 ? (
             <div className="flex justify-between text-success">
               <span>Хэмнэлт</span>
@@ -74,11 +81,11 @@ export default async function SuccessPage({ params }: Props) {
             </div>
           ) : null}
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Хүргэлт</span>
-            <span className="uppercase font-medium">Үнэгүй</span>
+            <span className="text-muted-foreground">Хүргэлт ({SHIPPING_LABEL})</span>
+            <span className="font-medium">{formatMNT(order.shippingMnt)}</span>
           </div>
           <div className="flex justify-between border-t pt-2">
-            <span className="font-semibold">Нийт</span>
+            <span className="font-semibold">Нийт төлөх</span>
             <span className="font-bold">{formatMNT(order.totalMnt)}</span>
           </div>
         </div>
@@ -87,8 +94,10 @@ export default async function SuccessPage({ params }: Props) {
       <div className="mt-6 rounded-lg border p-6 text-sm">
         <h3 className="font-semibold mb-2">Дараагийн алхам</h3>
         <p className="text-muted-foreground leading-relaxed">
-          Манай ажилтан таны утсаар ({order.phone}) удахгүй холбогдож захиалгыг
-          баталгаажуулна. Хүргэлтийн ажилтан барааг авахдаа төлбөрийг бэлэн мөнгөөр авна.
+          Манай ажилтан таны холбоо барих дугаар луу{" "}
+          <span className="font-semibold text-foreground">{formatPhone(shopPhone)}</span>{" "}
+          дугаараас удахгүй холбогдож захиалгыг баталгаажуулна. Хүргэлтийн ажилтан барааг
+          хүлээлгэн өгөхдөө захиалга болон хүргэлтийн төлбөрийг хамт авна.
         </p>
       </div>
 

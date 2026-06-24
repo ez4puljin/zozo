@@ -57,7 +57,7 @@ export function SettingsForm({ initial }: { initial: Initial }) {
             value={data.shopPhone ?? ""}
             onChange={(e) => setData((d) => ({ ...d, shopPhone: e.target.value || null }))}
             className={inputCls}
-            placeholder="9999-9999"
+            placeholder="86058979"
           />
         </Field>
         <Field label="И-мэйл">

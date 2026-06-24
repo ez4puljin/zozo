@@ -12,7 +12,7 @@ import {
   AlertTriangle,
   Crown,
 } from "lucide-react";
-import { formatMNT, formatDate, formatPhone } from "@/lib/utils";
+import { formatMNT, formatDate, formatPhone, fullName } from "@/lib/utils";
 import { RevenueChart } from "@/components/admin/RevenueChart";
 import { StatCard } from "@/components/admin/StatCard";
 import { StatusBadge } from "@/components/admin/StatusBadge";
@@ -297,7 +297,7 @@ export default async function AdminDashboard() {
                         <StatusBadge status={o.status} size="xs" />
                       </div>
                       <div className="text-xs text-muted-foreground mt-0.5 truncate">
-                        {o.lastName} {o.firstName} · {formatPhone(o.phone)} · {formatDate(o.createdAt)}
+                        {fullName(o.firstName, o.lastName)} · {formatPhone(o.phone)} · {formatDate(o.createdAt)}
                       </div>
                     </div>
                     <div className="text-sm font-semibold tabular-nums shrink-0">
@@ -365,7 +365,7 @@ export default async function AdminDashboard() {
               <li key={o.id} className="flex items-center gap-3 px-5 py-3 hover:bg-muted/30 transition">
                 <div className="min-w-0 flex-1">
                   <Link href={`/admin/orders/${o.id}`} className="text-sm font-medium hover:underline">
-                    #{o.orderNumber} · {o.lastName} {o.firstName}
+                    #{o.orderNumber} · {fullName(o.firstName, o.lastName)}
                   </Link>
                   <div className="text-xs text-muted-foreground mt-0.5">
                     {o.district} · {formatDate(o.createdAt)}

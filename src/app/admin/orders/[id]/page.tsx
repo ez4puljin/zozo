@@ -4,7 +4,7 @@ import Image from "next/image";
 import { db } from "@/lib/db";
 import { orders, orderItems, orderStatusLabel } from "@/lib/schema";
 import { eq } from "drizzle-orm";
-import { formatDate, formatMNT, formatPhone } from "@/lib/utils";
+import { formatDate, formatMNT, formatPhone, fullName } from "@/lib/utils";
 import { OrderStatusSelect } from "@/components/admin/OrderStatusSelect";
 import { OrderInternalNotes } from "@/components/admin/OrderInternalNotes";
 import { StatusBadge } from "@/components/admin/StatusBadge";
@@ -138,7 +138,7 @@ export default async function AdminOrderDetail({ params }: Props) {
               <div>
                 <div className="text-xs text-muted-foreground">Хүлээн авагч</div>
                 <div className="font-semibold text-sm mt-0.5">
-                  {order.lastName} {order.firstName}
+                  {fullName(order.firstName, order.lastName)}
                 </div>
               </div>
               <a

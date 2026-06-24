@@ -38,7 +38,7 @@ async function main() {
       id: 1,
       promoBannerText: "Чанарын баталгаатай | Шуурхай хүргэлт",
       promoBannerEnabled: true,
-      shopPhone: "9999-9999",
+      shopPhone: "86058979",
       shopEmail: "info@zozo.mn",
     })
     .onConflictDoNothing();

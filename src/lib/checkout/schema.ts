@@ -9,7 +9,8 @@ export const phoneSchema = z
 export const checkoutFormSchema = z.object({
   phone: phoneSchema,
   firstName: z.string().trim().min(1, "Нэр заавал бичих").max(60),
-  lastName: z.string().trim().min(1, "Овог заавал бичих").max(60),
+  // Овог нь заавал биш — зөвхөн нэр хангалттай.
+  lastName: z.string().trim().max(60).optional().or(z.literal("")),
   district: z.string().trim().min(1, "Дүүрэг/Аймаг заавал").max(80),
   khoroo: z.string().trim().max(80).optional().or(z.literal("")),
   building: z.string().trim().max(120).optional().or(z.literal("")),

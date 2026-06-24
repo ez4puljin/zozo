@@ -47,9 +47,9 @@ export function HowToUseAccordion({ howToUseMd, descriptionMd }: Props) {
           </Accordion.Trigger>
         </Accordion.Header>
         <Accordion.Content className="pb-4 text-sm text-muted-foreground leading-relaxed">
-          • Шуурхай хүргэлт — Үнэгүй
+          • Шуурхай хүргэлт — Хотын А бүсэд 6,000₮
           <br />
-          • Төлбөр — Авахдаа төлөх
+          • Төлбөр — Авахдаа төлөх (бараа + хүргэлтийн төлбөрийг хамт)
           <br />
           • Захиалга баталгаажуулсны дараа хүргэлтийн ажилтан утсаар холбогдоно.
         </Accordion.Content>

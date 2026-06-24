@@ -7,7 +7,7 @@ import {
   orderStatus,
 } from "@/lib/schema";
 import { desc, eq, like, or, and, sql } from "drizzle-orm";
-import { formatDate, formatMNT, formatPhone } from "@/lib/utils";
+import { formatDate, formatMNT, formatPhone, fullName } from "@/lib/utils";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { EmptyState } from "@/components/admin/EmptyState";
@@ -158,7 +158,7 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
                     </td>
                     <td className="px-4 py-3">
                       <div className="font-medium">
-                        {o.lastName} {o.firstName}
+                        {fullName(o.firstName, o.lastName)}
                       </div>
                       <div className="text-xs text-muted-foreground truncate max-w-[200px]">
                         {o.district}
@@ -197,7 +197,7 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
                       <StatusBadge status={o.status} size="xs" />
                     </div>
                     <div className="text-sm">
-                      {o.lastName} {o.firstName}
+                      {fullName(o.firstName, o.lastName)}
                     </div>
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>{formatPhone(o.phone)} · {formatDate(o.createdAt)}</span>

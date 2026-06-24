@@ -67,7 +67,7 @@ export default async function Home() {
             шуурхай хүргэлт.
           </h1>
           <p className="mx-auto mt-6 max-w-[540px] text-lg leading-relaxed text-muted-foreground">
-            Зөвхөн өнөөдөр захиалбал — хүргэлт үнэгүй. Авахдаа төлөх боломжтой.
+            Хотын А бүсэд хүргэлт 6,000₮. Авахдаа төлөх боломжтой.
           </p>
           <div className="mt-9">
             <Link href="/collections/all" className="zz-btn-pill">
