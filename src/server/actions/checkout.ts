@@ -19,6 +19,7 @@ import { env } from "@/lib/env";
 import { formatDate, newId } from "@/lib/utils";
 import { SHIPPING_MNT } from "@/lib/constants";
 import { getShopName } from "@/lib/settings";
+import { sendTelegramMessage, escapeHtml } from "@/lib/telegram";
 import { createHash } from "node:crypto";
 
 export type CreateOrderResult =
@@ -237,6 +238,53 @@ export async function createOrderAction(input: unknown): Promise<CreateOrderResu
       }
     } else {
       console.log(`[email] Skipped (no RESEND_API_KEY). Order #${orderNumber} created.`);
+    }
+
+    // Fire Telegram notification — the reliable channel. Non-blocking.
+    try {
+      const esc = escapeHtml;
+      const addr = [
+        data.customer.district,
+        data.customer.khoroo,
+        [data.customer.building, data.customer.entrance, data.customer.floor, data.customer.apartment]
+          .filter(Boolean)
+          .join(", "),
+      ]
+        .filter(Boolean)
+        .join(" · ");
+
+      const itemLines = itemsForDb
+        .map(
+          (it) =>
+            `• ${esc(it.productName)} (${esc(it.variantLabel)}) × ${it.quantity} — ${new Intl.NumberFormat("mn-MN").format(it.lineTotalMnt)}₮`
+        )
+        .join("\n");
+
+      const lines = [
+        `🛒 <b>Шинэ захиалга</b> #${esc(orderNumber)}`,
+        ``,
+        `👤 ${esc([data.customer.firstName, data.customer.lastName].filter(Boolean).join(" "))}`,
+        `📞 ${esc(data.customer.phone)}${data.customer.additionalPhone ? ` · ${esc(data.customer.additionalPhone)}` : ""}`,
+        `📍 ${esc(addr)}`,
+        data.customer.notes ? `📝 ${esc(data.customer.notes)}` : "",
+        ``,
+        `<b>Захиалга:</b>`,
+        itemLines,
+        ``,
+        `Дэд дүн: ${new Intl.NumberFormat("mn-MN").format(subtotal)}₮`,
+        discount > 0 ? `Хэмнэлт: -${new Intl.NumberFormat("mn-MN").format(discount)}₮` : "",
+        `Хүргэлт: ${new Intl.NumberFormat("mn-MN").format(shipping)}₮`,
+        `<b>Нийт: ${new Intl.NumberFormat("mn-MN").format(total)}₮</b>`,
+        ``,
+        `💵 Авахдаа төлөх`,
+        `🔗 <a href="${env.NEXT_PUBLIC_SITE_URL}/admin/orders/${orderId}">Захиалгыг нээх</a>`,
+      ]
+        .filter((l) => l !== "")
+        .join("\n");
+
+      await sendTelegramMessage(lines);
+    } catch (e) {
+      console.error("[telegram] failed to send order notification:", e);
     }
 
     revalidatePath("/admin/orders");

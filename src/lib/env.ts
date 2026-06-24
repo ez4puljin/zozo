@@ -44,6 +44,11 @@ const envSchema = z.object({
 
   BLOB_READ_WRITE_TOKEN: z.string().optional(),
   NEXT_PUBLIC_FB_PIXEL_ID: z.string().optional(),
+
+  // Telegram order notifications (free, reliable). CHAT_ID may be a
+  // single id or a comma-separated list for multiple recipients.
+  TELEGRAM_BOT_TOKEN: z.string().optional(),
+  TELEGRAM_CHAT_ID: z.string().optional(),
 });
 
 // Use normalized SITE_URL instead of the raw env value

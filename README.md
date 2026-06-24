@@ -76,6 +76,22 @@ DATABASE_URL=libsql://... DATABASE_AUTH_TOKEN=... npm run db:seed
 3. Эхэндээ `RESEND_FROM_EMAIL=onboarding@resend.dev` ашиглаж болно
 4. Domain-аа худалдан авсны дараа Resend-д domain нэмж DNS verify хийгээд `RESEND_FROM_EMAIL=orders@yourdomain.mn` болгоно
 
+### 3b. Telegram захиалгын мэдэгдэл (зөвлөмж — найдвартай)
+
+Захиалга бүрийг шуурхай мэдэхэд хамгийн найдвартай суваг (имэйлээс илүү найдвартай, үнэгүй, домэйн шаардахгүй):
+
+1. Telegram дээр **@BotFather** → `/newbot` → нэр өгч **TOKEN** авна.
+2. Шинэ бот руугаа ямар нэг мессеж бичих.
+3. Local-д `TELEGRAM_BOT_TOKEN`-оо тавиад chat_id-гаа олно:
+   ```powershell
+   $env:TELEGRAM_BOT_TOKEN="123:abc"; npx tsx scripts/telegram-setup.ts
+   ```
+   Гарсан `chat_id`-г хуулна. (Олон ажилтан хүлээж авах бол ботоо группд нэмж группын id ашиглана.)
+4. Vercel → Settings → Environment Variables:
+   - `TELEGRAM_BOT_TOKEN` = token
+   - `TELEGRAM_CHAT_ID` = chat_id (олон бол таслалаар: `111,222`)
+5. Redeploy. Дараа test захиалга өгөхөд Telegram-д шуурхай мессеж ирнэ.
+
 ### 4. Facebook Pixel (нэмэлт)
 
 1. Meta Business Suite → Events Manager → Pixel үүсгэх
