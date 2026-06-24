@@ -1,13 +1,12 @@
 import Link from "next/link";
-import { env } from "@/lib/env";
 
-export function SiteFooter() {
+export function SiteFooter({ shopName = "ZoZo" }: { shopName?: string }) {
   return (
     <footer className="border-t mt-20">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
           <div>
-            <div className="text-lg font-bold">{env.NEXT_PUBLIC_SITE_NAME}</div>
+            <div className="text-lg font-bold">{shopName}</div>
             <p className="mt-2 text-sm text-muted-foreground">
               Чанарын баталгаатай бараа, шуурхай хүргэлт.
             </p>
@@ -42,7 +41,7 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="mt-10 border-t pt-6 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} {env.NEXT_PUBLIC_SITE_NAME}. Бүх эрх хуулиар хамгаалагдсан.
+          © {new Date().getFullYear()} {shopName}. Бүх эрх хуулиар хамгаалагдсан.
         </div>
       </div>
     </footer>

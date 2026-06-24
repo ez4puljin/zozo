@@ -19,6 +19,7 @@ export default async function AdminSettingsPage() {
 
       <SettingsForm
         initial={{
+          shopName: s?.shopName ?? "ZoZo",
           promoBannerText: s?.promoBannerText ?? "Чанарын баталгаатай | Шуурхай хүргэлт",
           promoBannerEnabled: s?.promoBannerEnabled ?? true,
           announcementMd: s?.announcementMd ?? null,

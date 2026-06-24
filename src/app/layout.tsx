@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { env } from "@/lib/env";
+import { getShopName } from "@/lib/settings";
 
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
@@ -10,19 +11,22 @@ const inter = Inter({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(env.NEXT_PUBLIC_SITE_URL),
-  title: {
-    default: env.NEXT_PUBLIC_SITE_NAME,
-    template: `%s | ${env.NEXT_PUBLIC_SITE_NAME}`,
-  },
-  description: "Чанарын баталгаатай бараа, шуурхай хүргэлт.",
-  openGraph: {
-    type: "website",
-    siteName: env.NEXT_PUBLIC_SITE_NAME,
-    locale: "mn_MN",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const shopName = await getShopName();
+  return {
+    metadataBase: new URL(env.NEXT_PUBLIC_SITE_URL),
+    title: {
+      default: shopName,
+      template: `%s | ${shopName}`,
+    },
+    description: "Чанарын баталгаатай бараа, шуурхай хүргэлт.",
+    openGraph: {
+      type: "website",
+      siteName: shopName,
+      locale: "mn_MN",
+    },
+  };
+}
 
 export default function RootLayout({
   children,

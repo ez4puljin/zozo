@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { LoginForm } from "./LoginForm";
+import { getShopName } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: "Admin нэвтрэх",
@@ -9,13 +10,14 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default function AdminLoginPage() {
+export default async function AdminLoginPage() {
+  const shopName = await getShopName();
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col">
       <div className="flex-1 flex items-center justify-center px-4 py-10">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
-            <div className="text-2xl font-bold tracking-tight">ZoZo Admin</div>
+            <div className="text-2xl font-bold tracking-tight">{shopName} Admin</div>
             <p className="mt-2 text-sm text-muted-foreground">
               Дэлгүүрийн удирдлагын самбарт нэвтрэнэ үү.
             </p>

@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 const schema = z.object({
+  shopName: z.string().trim().min(1, "Дэлгүүрийн нэр заавал").max(60),
   promoBannerText: z.string().max(200).default(""),
   promoBannerEnabled: z.boolean().default(true),
   announcementMd: z.string().max(2000).nullable().optional(),
@@ -28,6 +29,7 @@ export async function updateSettingsAction(
     .insert(settings)
     .values({
       id: 1,
+      shopName: v.shopName,
       promoBannerText: v.promoBannerText,
       promoBannerEnabled: v.promoBannerEnabled,
       announcementMd: v.announcementMd ?? null,
@@ -38,6 +40,7 @@ export async function updateSettingsAction(
     .onConflictDoUpdate({
       target: settings.id,
       set: {
+        shopName: v.shopName,
         promoBannerText: v.promoBannerText,
         promoBannerEnabled: v.promoBannerEnabled,
         announcementMd: v.announcementMd ?? null,
@@ -46,7 +49,7 @@ export async function updateSettingsAction(
         updatedAt: new Date(),
       },
     });
-  revalidatePath("/");
-  revalidatePath("/contact");
+  // Brand name + banner affect the whole site shell.
+  revalidatePath("/", "layout");
   return { ok: true };
 }

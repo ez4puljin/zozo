@@ -168,6 +168,7 @@ export type NewOrderItem = typeof orderItems.$inferInsert;
 // ---------- settings (singleton row, id=1) ----------
 export const settings = sqliteTable("settings", {
   id: integer("id").primaryKey(),
+  shopName: text("shop_name").notNull().default("ZoZo"),
   promoBannerText: text("promo_banner_text")
     .notNull()
     .default("Чанарын баталгаатай | Шуурхай хүргэлт"),

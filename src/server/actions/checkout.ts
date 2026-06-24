@@ -18,6 +18,7 @@ import { NewOrderAdmin } from "@/lib/email/templates/NewOrderAdmin";
 import { env } from "@/lib/env";
 import { formatDate, newId } from "@/lib/utils";
 import { SHIPPING_MNT } from "@/lib/constants";
+import { getShopName } from "@/lib/settings";
 import { createHash } from "node:crypto";
 
 export type CreateOrderResult =
@@ -192,6 +193,7 @@ export async function createOrderAction(input: unknown): Promise<CreateOrderResu
     const r = resend();
     if (r) {
       try {
+        const shopName = await getShopName();
         await r.emails.send({
           from: env.RESEND_FROM_EMAIL,
           to: env.ADMIN_NOTIFICATION_EMAIL,
@@ -227,7 +229,7 @@ export async function createOrderAction(input: unknown): Promise<CreateOrderResu
             discountMnt: discount,
             totalMnt: total,
             adminUrl: `${env.NEXT_PUBLIC_SITE_URL}/admin/orders/${orderId}`,
-            shopName: env.NEXT_PUBLIC_SITE_NAME,
+            shopName,
           }),
         });
       } catch (e) {

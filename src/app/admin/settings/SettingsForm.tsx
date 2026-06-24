@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { updateSettingsAction } from "@/server/actions/admin-settings";
 
 interface Initial {
+  shopName: string;
   promoBannerText: string;
   promoBannerEnabled: boolean;
   announcementMd: string | null;
@@ -33,6 +34,18 @@ export function SettingsForm({ initial }: { initial: Initial }) {
       }}
       className="space-y-4"
     >
+      <Card title="Дэлгүүрийн нэр (бренд)">
+        <Field label="Нэр — сайтын толгой, footer, гарчигт харагдана">
+          <input
+            value={data.shopName}
+            onChange={(e) => setData((d) => ({ ...d, shopName: e.target.value }))}
+            className={inputCls}
+            placeholder="ZoZo"
+            maxLength={60}
+          />
+        </Field>
+      </Card>
+
       <Card title="Promo banner">
         <label className="inline-flex items-center gap-2 text-sm mb-2">
           <input

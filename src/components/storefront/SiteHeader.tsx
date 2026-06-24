@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { env } from "@/lib/env";
 import { CartIconBadge } from "./CartIconBadge";
 
-export function SiteHeader() {
+export function SiteHeader({ shopName = "ZoZo" }: { shopName?: string }) {
   return (
     <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur-md supports-[backdrop-filter]:bg-background/85">
       <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8" style={{ height: 72 }}>
@@ -22,9 +21,9 @@ export function SiteHeader() {
           href="/"
           className="text-[22px] font-bold"
           style={{ letterSpacing: "-0.04em" }}
-          aria-label={env.NEXT_PUBLIC_SITE_NAME}
+          aria-label={shopName}
         >
-          {env.NEXT_PUBLIC_SITE_NAME}
+          {shopName}
         </Link>
 
         <div className="flex items-center">

@@ -21,14 +21,15 @@ export default async function StorefrontLayout({
   children: React.ReactNode;
 }) {
   const cfg = await getSettings();
+  const shopName = cfg?.shopName?.trim() || "ZoZo";
   return (
     <>
       {cfg?.promoBannerEnabled && cfg.promoBannerText ? (
         <PromoBanner text={cfg.promoBannerText} />
       ) : null}
-      <SiteHeader />
+      <SiteHeader shopName={shopName} />
       <main className="min-h-[60vh]">{children}</main>
-      <SiteFooter />
+      <SiteFooter shopName={shopName} />
       <CartDrawer />
     </>
   );

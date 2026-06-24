@@ -18,13 +18,13 @@ function isActive(pathname: string, href: string, exact?: boolean) {
   return exact ? pathname === href : pathname === href || pathname.startsWith(href + "/");
 }
 
-export function AdminSidebar() {
+export function AdminSidebar({ shopName = "ZoZo" }: { shopName?: string }) {
   const pathname = usePathname();
   return (
     <aside className="hidden lg:flex lg:flex-col w-60 shrink-0 border-r bg-background min-h-screen sticky top-0">
       <div className="px-6 py-5">
         <Link href="/admin" className="text-lg font-bold tracking-tight">
-          ZoZo <span className="text-muted-foreground font-normal">Admin</span>
+          {shopName} <span className="text-muted-foreground font-normal">Admin</span>
         </Link>
         <Link
           href="/"
@@ -63,7 +63,7 @@ export function AdminSidebar() {
   );
 }
 
-export function AdminMobileHeader() {
+export function AdminMobileHeader({ shopName = "ZoZo" }: { shopName?: string }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -78,7 +78,7 @@ export function AdminMobileHeader() {
           <Menu className="h-5 w-5" />
         </button>
         <Link href="/admin" className="font-bold tracking-tight">
-          ZoZo Admin
+          {shopName} Admin
         </Link>
         <Link
           href="/"
@@ -108,7 +108,7 @@ export function AdminMobileHeader() {
       >
         <div className="flex items-center justify-between px-5 py-4 border-b">
           <Link href="/admin" onClick={() => setOpen(false)} className="font-bold">
-            ZoZo Admin
+            {shopName} Admin
           </Link>
           <button
             onClick={() => setOpen(false)}
